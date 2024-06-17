@@ -1,6 +1,12 @@
 # APIs GATEWAY SERVER
 This is apis gateway server
 
+The API Gateway currently performs two main functions:
+
+1. It verifies whether a user is authorized to send an email.
+2. It validates email requests before forwarding request to the Gmail Server.
+3. It validates SMS requests before forwarding request to the Twilio Server.
+
 ## INSTALLATION AND DB SETUP
 
 1. Clone the repository:
