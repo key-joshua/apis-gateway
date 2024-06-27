@@ -5,16 +5,45 @@ import { Request, Response, NextFunction } from 'express'
 import { comparePassword } from '../utils/passwordUtils'
 import authRepositories from '../modules/auth/repository/authRepositories'
 
-const validation = (schema: Joi.ObjectSchema | Joi.ArraySchema) => async (req: Request, res: Response, next: NextFunction) => {
+const isBodyValidation = (schema: Joi.ObjectSchema | Joi.ArraySchema) => async (req: Request, res: Response, next: NextFunction) => {
   try {
-        const { error } = schema.validate(req.body, { abortEarly: false })
-        if (error) {
-          throw new Error(error.details.map((detail) => detail.message.replace(/"/g, '')).join(', '))
-        }
+    const { error } = schema.validate(req.body, { abortEarly: false })
+    if (error) {
+      const errorMessage = error.details.map((detail) => detail.message.replace(/"/g, '')).join(', ')
+      return res.status(httpStatus.BAD_REQUEST).json({ status: httpStatus.BAD_REQUEST, error: errorMessage })
+    }
 
-        return next()
-  } catch (error: any) {
-    return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: httpStatus.INTERNAL_SERVER_ERROR, error: error.message })
+    return next()
+  } catch (error: unknown) {
+     return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Internal Server error', error })
+  }
+}
+
+const isQueryValidation = (schema: Joi.ObjectSchema | Joi.ArraySchema) => async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { error } = schema.validate(req.query, { abortEarly: false })
+    if (error) {
+      const errorMessage = error.details.map((detail) => detail.message.replace(/"/g, '')).join(', ')
+      return res.status(httpStatus.BAD_REQUEST).json({ status: httpStatus.BAD_REQUEST, error: errorMessage })
+    }
+
+    return next()
+  } catch (error: unknown) {
+     return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Internal Server error', error })
+  }
+}
+
+const isParamValidation = (schema: Joi.ObjectSchema | Joi.ArraySchema) => async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { error } = schema.validate(req.params, { abortEarly: false })
+    if (error) {
+      const errorMessage = error.details.map((detail) => detail.message.replace(/"/g, '')).join(', ')
+      return res.status(httpStatus.BAD_REQUEST).json({ status: httpStatus.BAD_REQUEST, error: errorMessage })
+    }
+
+    return next()
+  } catch (error: unknown) {
+     return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Internal Server error', error })
   }
 }
 
@@ -26,8 +55,8 @@ const isUserVerified = async (req: any, res: Response, next: NextFunction) => {
 
     req.user = user
     return next()
-  } catch (error: any) {
-    return  res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: httpStatus.INTERNAL_SERVER_ERROR, error: error.message })
+  } catch (error: unknown) {
+     return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Internal Server error', error })
   }
 }
 
@@ -41,9 +70,9 @@ const isCredentialExist = async (req: any, res: Response, next: NextFunction) =>
 
     req.user = user
     return next()
-  } catch (error: any) {
-    return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Internal Server error', data: error.message })
+  } catch (error: unknown) {
+    return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Internal Server error', error })
   }
 }
 
-export { validation, isCredentialExist, isUserVerified }
+export { isBodyValidation, isQueryValidation, isParamValidation, isCredentialExist, isUserVerified }

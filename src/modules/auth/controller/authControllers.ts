@@ -12,8 +12,8 @@ const signin = async (req: any, res: Response) => {
 
     await authRepositories.createSession(session)
     return res.status(httpStatus.OK).json({ status: httpStatus.OK, message: 'Logged in successfully', data: { token } })
-  } catch (error: any) {
-    return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: httpStatus.INTERNAL_SERVER_ERROR, message: error.message })
+  } catch (error: unknown) {
+    return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Internal Server error', error })
   }
 }
 
