@@ -4,7 +4,7 @@ import { Response, NextFunction } from 'express'
 export const userAuthorization = async (req: any, res: Response, next: NextFunction) => {
   try {
     const token = req.headers['authorization']?.split(' ')[1]
-    if (!token) return res.status(httpStatus.UNAUTHORIZED).json({ status: httpStatus.UNAUTHORIZED, error: 'Not authorized, Authorization token is rewuired' })
+    if (!token) return res.status(httpStatus.UNAUTHORIZED).json({ status: httpStatus.UNAUTHORIZED, error: 'Not authorized, Authorization token is rewuired in the headers' })
 
     next()
   } catch (error: any) {
